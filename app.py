@@ -4,13 +4,12 @@ import bcrypt
 import os
 from dotenv import load_dotenv
 
-# تحميل المتغيرات من ملف .env
 load_dotenv()
 
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY')
 
-# دالة للاتصال بقاعدة البيانات
+
 def get_db_connection():
     return pymysql.connect(
         host=os.getenv('DB_HOST'),
@@ -28,7 +27,7 @@ def register():
         password = request.form['password']
         confirm = request.form['confirm_password']
 
-        # التحقق من البيانات
+        
         if not name:
             flash('Name is required', 'danger')
             return render_template('register.html')
@@ -42,7 +41,7 @@ def register():
             flash('Passwords do not match', 'danger')
             return render_template('register.html')
 
-        # تشفير كلمة المرور
+        
         hashed_pw = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
 
         conn = get_db_connection()
@@ -52,7 +51,7 @@ def register():
                            (email, name, hashed_pw.decode('utf-8')))
             conn.commit()
             
-            # تسجيل الدخول التلقائي بعد التسجيل
+            
             cursor.execute('SELECT user_id, name FROM users WHERE email = %s', (email,))
             user = cursor.fetchone()
             session['user_id'] = user['user_id']
