@@ -15,9 +15,12 @@
                 {% endif %}
             </td>
             <td>
-                <form action="/delete_author/{{ author.author_id }}" method="GET">
-                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                </form>
+                <div class="d-flex gap-1">
+                    <a href="{{ url_for('edit_author', id=author.author_id) }}" class="btn btn-warning btn-sm">Edit</a>
+                    <form action="/delete_author/{{ author.author_id }}" method="GET">
+                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                    </form>
+                </div>
             </td>
         </tr>
         {% endfor %}
@@ -38,9 +41,12 @@
                 {% endif %}
             </td>
             <td>
-                <form action="/delete_book/{{ book.book_id }}" method="GET">
-                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                </form>
+                <div class="d-flex gap-1">
+                    <a href="{{ url_for('edit_book', id=book.book_id) }}" class="btn btn-warning btn-sm">Edit</a>
+                    <form action="/delete_book/{{ book.book_id }}" method="GET">
+                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                    </form>
+                </div>
             </td>
         </tr>
         {% endfor %}

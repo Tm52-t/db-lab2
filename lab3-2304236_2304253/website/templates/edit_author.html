@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block content %}
+<h3>Edit Author #{{ author.author_id }}</h3>
+<form method="POST" enctype="multipart/form-data">
+    <label class="form-label">Name</label>
+    <input class="form-control mb-2" type="text" name="name" value="{{ author.name }}" required>
+
+    <label class="form-label">Country</label>
+    <input class="form-control mb-2" type="text" name="country" value="{{ author.country or '' }}">
+
+    <label class="form-label">Photo</label>
+    {% if author.photo %}
+    <div class="mb-2">
+        <img src="{{ url_for('static', filename=author.photo) }}" width="60" height="60" style="object-fit: cover;">
+        <small class="text-muted">Current photo</small>
+    </div>
+    {% endif %}
+    <input class="form-control mb-1" type="file" name="photo" accept="image/*">
+    <small class="text-muted d-block mb-3">Leave empty to keep the current photo.</small>
+
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a href="{{ url_for('library') }}" class="btn btn-secondary">Cancel</a>
+</form>
+{% endblock %}

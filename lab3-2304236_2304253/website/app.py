@@ -252,6 +252,91 @@ def add_book():
     
     return redirect(url_for('library'))
 
+# ---------- F2.3: EDIT ----------
+
+@app.route('/edit_author/<int:id>', methods=['GET', 'POST'])
+def edit_author(id):
+    conn = get_library_connection()
+    cursor = conn.cursor()
+    try:
+        if request.method == 'POST':
+            name = request.form['name'].strip()
+            country = request.form['country'].strip()
+            photo = request.files.get('photo')
+
+            if not name:
+                flash('Name is required', 'danger')
+                return redirect(url_for('edit_author', id=id))
+
+            if photo and photo.filename:
+                filename = secure_filename(photo.filename)
+                photo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                cursor.execute(
+                    "UPDATE AUTHOR SET name = %s, country = %s, photo = %s WHERE author_id = %s",
+                    (name, country, f"images/{filename}", id))
+            else:
+                # مفيش صورة جديدة: سيب الصورة القديمة زي ما هي
+                cursor.execute(
+                    "UPDATE AUTHOR SET name = %s, country = %s WHERE author_id = %s",
+                    (name, country, id))
+            conn.commit()
+            return redirect(url_for('library'))
+
+        cursor.execute("SELECT * FROM AUTHOR WHERE author_id = %s", (id,))
+        author = cursor.fetchone()
+        if not author:
+            flash('Author not found', 'danger')
+            return redirect(url_for('library'))
+        return render_template('edit_author.html', author=author)
+    finally:
+        cursor.close()
+        conn.close()
+
+@app.route('/edit_book/<int:id>', methods=['GET', 'POST'])
+def edit_book(id):
+    conn = get_library_connection()
+    cursor = conn.cursor()
+    try:
+        if request.method == 'POST':
+            title = request.form['title'].strip()
+            price = request.form['price']
+            author_id = request.form['author_id']
+            cover = request.files.get('cover')
+
+            if not title:
+                flash('Title is required', 'danger')
+                return redirect(url_for('edit_book', id=id))
+
+            try:
+                if cover and cover.filename:
+                    filename = secure_filename(cover.filename)
+                    cover.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                    cursor.execute(
+                        "UPDATE BOOK SET title = %s, price = %s, author_id = %s, cover = %s WHERE book_id = %s",
+                        (title, price, author_id, f"images/{filename}", id))
+                else:
+                    cursor.execute(
+                        "UPDATE BOOK SET title = %s, price = %s, author_id = %s WHERE book_id = %s",
+                        (title, price, author_id, id))
+                conn.commit()
+            except pymysql.err.IntegrityError:
+                # الـ foreign key اترفض: الـ author_id مش موجود
+                flash('Author ID does not exist', 'danger')
+                return redirect(url_for('edit_book', id=id))
+            return redirect(url_for('library'))
+
+        cursor.execute("SELECT * FROM BOOK WHERE book_id = %s", (id,))
+        book = cursor.fetchone()
+        if not book:
+            flash('Book not found', 'danger')
+            return redirect(url_for('library'))
+        return render_template('edit_book.html', book=book)
+    finally:
+        cursor.close()
+        conn.close()
+
+# ---------- F2.4 / F2.5: DELETE ----------
+
 @app.route('/delete_book/<int:id>')
 def delete_book(id):
     conn = get_library_connection()

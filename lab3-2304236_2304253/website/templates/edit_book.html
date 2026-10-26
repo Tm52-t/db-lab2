@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block content %}
+<h3>Edit Book #{{ book.book_id }}</h3>
+<form method="POST" enctype="multipart/form-data">
+    <label class="form-label">Title</label>
+    <input class="form-control mb-2" type="text" name="title" value="{{ book.title }}" required>
+
+    <label class="form-label">Price</label>
+    <input class="form-control mb-2" type="number" step="0.01" name="price" value="{{ book.price if book.price is not none else '' }}">
+
+    <label class="form-label">Author ID</label>
+    <input class="form-control mb-2" type="number" name="author_id" value="{{ book.author_id }}" required>
+
+    <label class="form-label">Cover</label>
+    {% if book.cover %}
+    <div class="mb-2">
+        <img src="{{ url_for('static', filename=book.cover) }}" width="50" height="70" style="object-fit: cover;">
+        <small class="text-muted">Current cover</small>
+    </div>
+    {% endif %}
+    <input class="form-control mb-1" type="file" name="cover" accept="image/*">
+    <small class="text-muted d-block mb-3">Leave empty to keep the current cover.</small>
+
+    <button type="submit" class="btn btn-success">Save</button>
+    <a href="{{ url_for('library') }}" class="btn btn-secondary">Cancel</a>
+</form>
+{% endblock %}
